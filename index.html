@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            flex-direction: column;
+        }
+
+        #mainMenu, #gameArea {
+            display: none;
+            text-align: center;
+        }
+
+        #mainMenu {
+            display: block;
+        }
+
+        #gameArea {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background-color: #87CEEB;
+            border: 2px solid #000;
+        }
+
+        #score {
+            font-size: 20px;
+            margin: 10px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            color: black;
+        }
+
+        .snake {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: green;
+        }
+
+        .food {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Контейнер для кнопок управления */
+        .controls {
+            display: none;
+            justify-content: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+        }
+
+        .control-btn:active {
+            background-color: #45a049;
+        }
+
+        .control-btns-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 10px;  /* расстояние между кнопками */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="mainMenu">
+        <h1>Snake Game</h1>
+        <p>Total Score: <span id="totalScore">0</span></p>
+        <button onclick="startGame()">Play Game</button>
+    </div>
+
+    <div id="gameArea">
+        <div id="score">Score: 0</div>
+    </div>
+
+    <div class="controls">
+        <div class="control-btns-container">
+            <button class="control-btn" onclick="changeDirection('LEFT')">←</button>
+            <button class="control-btn" onclick="changeDirection('UP')">↑</button>
+            <button class="control-btn" onclick="changeDirection('DOWN')">↓</button>
+            <button class="control-btn" onclick="changeDirection('RIGHT')">→</button>
+        </div>
+    </div>
+
+    <script>
+        let totalScore = 0;
+        let currentScore = 0;
+        let gameInterval;
+        let snake = [{ x: 150, y: 150 }];
+        let snakeDirection = 'RIGHT';
+        let food = { x: 0, y: 0 };
+        const snakeSize = 10;
+        const gameAreaWidth = 400;
+        const gameAreaHeight = 400;
+
+        // Восстановить сохраненные данные
+        if (localStorage.getItem('totalScore')) {
+            totalScore = parseInt(localStorage.getItem('totalScore'));
+        }
+        document.getElementById('totalScore').textContent = totalScore;
+
+        function startGame() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.querySelector('.controls').style.display = 'flex'; // Показать кнопки управления
+            resetGame();
+            gameInterval = setInterval(gameLoop, 100);
+        }
+
+        function resetGame() {
+            currentScore = 0;
+            snake = [{ x: 150, y: 150 }];
+            snakeDirection = 'RIGHT';
+            spawnFood();
+            updateSnakePosition();
+            updateScore();
+        }
+
+        function gameLoop() {
+            moveSnake();
+            if (checkCollision()) {
+                endGame();
+            } else {
+                if (checkFoodCollision()) {
+                    currentScore++;
+                    spawnFood(); // генерируем новую еду
+                    updateScore();
+                    snake.push({}); // Увеличиваем змею
+                }
+                updateSnakePosition();
+            }
+        }
+
+        function moveSnake() {
+            const head = { ...snake[0] };
+
+            if (snakeDirection === 'UP') head.y -= snakeSize;
+            if (snakeDirection === 'DOWN') head.y += snakeSize;
+            if (snakeDirection === 'LEFT') head.x -= snakeSize;
+            if (snakeDirection === 'RIGHT') head.x += snakeSize;
+
+            snake.unshift(head);  // Добавляем новый элемент в начало змеи
+            snake.pop(); // Убираем последний элемент (конец змеи)
+        }
+
+        function checkCollision() {
+            const head = snake[0];
+            // Столкновение с границами экрана
+            if (head.x < 0 || head.x >= gameAreaWidth || head.y < 0 || head.y >= gameAreaHeight) {
+                return true;
+            }
+            // Столкновение с телом змеи
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkFoodCollision() {
+            const head = snake[0];
+            return head.x === food.x && head.y === food.y;
+        }
+
+        function spawnFood() {
+            // Убираем старую еду
+            const oldFood = document.querySelector('.food');
+            if (oldFood) {
+                oldFood.remove();
+            }
+
+            // Генерируем новые координаты для еды
+            food.x = Math.floor(Math.random() * (gameAreaWidth / snakeSize)) * snakeSize;
+            food.y = Math.floor(Math.random() * (gameAreaHeight / snakeSize)) * snakeSize;
+            createFoodElement();
+        }
+
+        function createFoodElement() {
+            const foodElement = document.createElement('div');
+            foodElement.classList.add('food');
+            foodElement.style.left = `${food.x}px`;
+            foodElement.style.top = `${food.y}px`;
+            document.getElementById('gameArea').appendChild(foodElement);
+        }
+
+        function updateSnakePosition() {
+            // Очистить старые элементы змеи
+            const snakeElements = document.querySelectorAll('.snake');
+            snakeElements.forEach((el) => el.remove());
+
+            snake.forEach((segment) => {
+                const snakeSegment = document.createElement('div');
+                snakeSegment.classList.add('snake');
+                snakeSegment.style.left = `${segment.x}px`;
+                snakeSegment.style.top = `${segment.y}px`;
+                document.getElementById('gameArea').appendChild(snakeSegment);
+            });
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${currentScore}`;
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            totalScore += currentScore;
+            localStorage.setItem('totalScore', totalScore);
+            alert(`Game Over! Your Score: ${currentScore}`);
+
+            // Отправка данных на сервер
+            sendScoreToServer(currentScore);
+
+            document.getElementById('gameArea').style.display = 'none';
+            document.querySelector('.controls').style.display = 'none'; // Скрыть кнопки управления
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('totalScore').textContent = totalScore;
+        }
+
+        // Функция для изменения направления с кнопок
+        function changeDirection(direction) {
+            if (direction === 'UP' && snakeDirection !== 'DOWN') snakeDirection = 'UP';
+            if (direction === 'DOWN' && snakeDirection !== 'UP') snakeDirection = 'DOWN';
+            if (direction === 'LEFT' && snakeDirection !== 'RIGHT') snakeDirection = 'LEFT';
+            if (direction === 'RIGHT' && snakeDirection !== 'LEFT') snakeDirection = 'RIGHT';
+        }
+
+        // Функция для отправки данных на сервер
+        function sendScoreToServer(score) {
+            const playerName = prompt("Enter your name:"); // Запрашиваем имя игрока
+
+            if (playerName) {
+                fetch('http://localhost:5000/submit_score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: playerName,
+                        score: score
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Score submitted successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error submitting score:', error);
+                });
+            }
+        }
+
+        // Управление с клавиатуры для десктопа
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' && snakeDirection !== 'DOWN') snakeDirection = 'UP';
+            if (e.key === 'ArrowDown' && snakeDirection !== 'UP') snakeDirection = 'DOWN';
+            if (e.key === 'ArrowLeft' && snakeDirection !== 'RIGHT') snakeDirection = 'LEFT';
+            if (e.key === 'ArrowRight' && snakeDirection !== 'LEFT') snakeDirection = 'RIGHT';
+        });
+    </script>
+
+</body>
+</html>
