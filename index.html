@@ -1,306 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
+    <title>Dia</title>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
     <style>
         body {
             font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #e0f7fa, #ffffff);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            flex-direction: column;
+            min-height: 100vh;
         }
-
-        #mainMenu, #gameArea {
-            display: none;
+        .container {
+            max-width: 800px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
             text-align: center;
         }
-
-        #mainMenu {
-            display: block;
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
         }
-
-        #gameArea {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            background-color: #87CEEB;
-            border: 2px solid #000;
+        .description {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 16px;
         }
-
-        #score {
+        h2 {
             font-size: 20px;
-            margin: 10px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 2;
-            color: black;
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
-
-        .snake {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: green;
+        ul {
+            text-align: left;
+            margin-bottom: 16px;
         }
-
-        .food {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
+        ul li {
+            margin: 8px 0;
         }
-
-        button {
+        .chart {
+            margin: 20px auto;
+        }
+        .download-button {
+            background-color: #007BFF;
+            color: #ffffff;
+            border: none;
             padding: 10px 20px;
             font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
+            text-decoration: none;
         }
-
-        button:hover {
-            background-color: #4CAF50;
-            color: white;
+        .download-button:hover {
+            background-color: #0056b3;
         }
-
-        /* Контейнер для кнопок управления */
-        .controls {
-            display: none;
-            justify-content: center;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        .control-btn {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            margin: 5px;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 50%;
-        }
-
-        .control-btn:active {
-            background-color: #45a049;
-        }
-
-        .control-btns-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            gap: 10px;  /* расстояние между кнопками */
-        }
-
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <div class="container">
+        <h1 class="title">Почему стоит использовать круговые диаграммы?</h1>
+        <p class="description">
+            Круговые диаграммы эффективно визуализируют пропорциональные данные. Они предоставляют
+            простой и наглядный способ представить части целого, что делает их подходящими для:
+        </p>
+        <ul>
+            <li>Показ распределения категорий.</li>
+            <li>Быстрого понимания пропорций с первого взгляда.</li>
+            <li>Создания визуально привлекательных презентаций.</li>
+        </ul>
 
-    <div id="mainMenu">
-        <h1>Snake Game</h1>
-        <p>Total Score: <span id="totalScore">0</span></p>
-        <button onclick="startGame()">Play Game</button>
-    </div>
+        <h2>Преимущества круговых диаграмм</h2>
+        <p>
+            Круговые диаграммы позволяют легко понять сложные данные на первый взгляд. Они помогают выявить
+            самые крупные и самые мелкие компоненты в наборе данных, фокусируя внимание на ключевых моментах.
+        </p>
 
-    <div id="gameArea">
-        <div id="score">Score: 0</div>
-    </div>
+        <h2>Сферы применения круговых диаграмм</h2>
+        <p>
+            Круговые диаграммы часто используются в бизнесе, образовании и СМИ для визуализации долей рынка,
+            результатов опросов и показателей производительности. Их простота делает их идеальными для
+            презентаций и отчетов.
+        </p>
 
-    <div class="controls">
-        <div class="control-btns-container">
-            <button class="control-btn" onclick="changeDirection('LEFT')">←</button>
-            <button class="control-btn" onclick="changeDirection('UP')">↑</button>
-            <button class="control-btn" onclick="changeDirection('DOWN')">↓</button>
-            <button class="control-btn" onclick="changeDirection('RIGHT')">→</button>
+        <div class="chart">
+            <canvas id="pieChart" width="400" height="400"></canvas>
         </div>
+
+        <h2>Почему выбрать наше приложение?</h2>
+        <p>
+            Наше приложение предлагает уникальные возможности для работы с круговыми диаграммами:
+        </p>
+        <ul>
+            <li>Удобный и интуитивно понятный интерфейс, позволяющий быстро создавать диаграммы.</li>
+            <li>Поддержка экспорта диаграмм в популярных форматах (PNG, PDF, и др.).</li>
+            <li>Интеграция с различными источниками данных для автоматической генерации диаграмм.</li>
+            <li>Высокая производительность даже при работе с большими объемами данных.</li>
+        </ul>
+        <p>
+            Выбирая наше приложение, вы получаете инструмент, который поможет вам эффективно и красиво представлять данные.
+        </p>
+
+        <a href="https://drive.google.com/drive/u/0/folders/1_nGeBudiFauXym7KK3f1QqO-WyinGdkv" download class="download-button">Скачать приложение</a>
     </div>
-
     <script>
-        let totalScore = 0;
-        let currentScore = 0;
-        let gameInterval;
-        let snake = [{ x: 150, y: 150 }];
-        let snakeDirection = 'RIGHT';
-        let food = { x: 0, y: 0 };
-        const snakeSize = 10;
-        const gameAreaWidth = 400;
-        const gameAreaHeight = 400;
-
-        // Восстановить сохраненные данные
-        if (localStorage.getItem('totalScore')) {
-            totalScore = parseInt(localStorage.getItem('totalScore'));
-        }
-        document.getElementById('totalScore').textContent = totalScore;
-
-        function startGame() {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
-            document.querySelector('.controls').style.display = 'flex'; // Показать кнопки управления
-            resetGame();
-            gameInterval = setInterval(gameLoop, 100);
-        }
-
-        function resetGame() {
-            currentScore = 0;
-            snake = [{ x: 150, y: 150 }];
-            snakeDirection = 'RIGHT';
-            spawnFood();
-            updateSnakePosition();
-            updateScore();
-        }
-
-        function gameLoop() {
-            moveSnake();
-            if (checkCollision()) {
-                endGame();
-            } else {
-                if (checkFoodCollision()) {
-                    currentScore++;
-                    spawnFood(); // генерируем новую еду
-                    updateScore();
-                    snake.push({}); // Увеличиваем змею
-                }
-                updateSnakePosition();
-            }
-        }
-
-        function moveSnake() {
-            const head = { ...snake[0] };
-
-            if (snakeDirection === 'UP') head.y -= snakeSize;
-            if (snakeDirection === 'DOWN') head.y += snakeSize;
-            if (snakeDirection === 'LEFT') head.x -= snakeSize;
-            if (snakeDirection === 'RIGHT') head.x += snakeSize;
-
-            snake.unshift(head);  // Добавляем новый элемент в начало змеи
-            snake.pop(); // Убираем последний элемент (конец змеи)
-        }
-
-        function checkCollision() {
-            const head = snake[0];
-            // Столкновение с границами экрана
-            if (head.x < 0 || head.x >= gameAreaWidth || head.y < 0 || head.y >= gameAreaHeight) {
-                return true;
-            }
-            // Столкновение с телом змеи
-            for (let i = 1; i < snake.length; i++) {
-                if (head.x === snake[i].x && head.y === snake[i].y) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function checkFoodCollision() {
-            const head = snake[0];
-            return head.x === food.x && head.y === food.y;
-        }
-
-        function spawnFood() {
-            // Убираем старую еду
-            const oldFood = document.querySelector('.food');
-            if (oldFood) {
-                oldFood.remove();
-            }
-
-            // Генерируем новые координаты для еды
-            food.x = Math.floor(Math.random() * (gameAreaWidth / snakeSize)) * snakeSize;
-            food.y = Math.floor(Math.random() * (gameAreaHeight / snakeSize)) * snakeSize;
-            createFoodElement();
-        }
-
-        function createFoodElement() {
-            const foodElement = document.createElement('div');
-            foodElement.classList.add('food');
-            foodElement.style.left = `${food.x}px`;
-            foodElement.style.top = `${food.y}px`;
-            document.getElementById('gameArea').appendChild(foodElement);
-        }
-
-        function updateSnakePosition() {
-            // Очистить старые элементы змеи
-            const snakeElements = document.querySelectorAll('.snake');
-            snakeElements.forEach((el) => el.remove());
-
-            snake.forEach((segment) => {
-                const snakeSegment = document.createElement('div');
-                snakeSegment.classList.add('snake');
-                snakeSegment.style.left = `${segment.x}px`;
-                snakeSegment.style.top = `${segment.y}px`;
-                document.getElementById('gameArea').appendChild(snakeSegment);
-            });
-        }
-
-        function updateScore() {
-            document.getElementById('score').textContent = `Score: ${currentScore}`;
-        }
-
-        function endGame() {
-            clearInterval(gameInterval);
-            totalScore += currentScore;
-            localStorage.setItem('totalScore', totalScore);
-            alert(`Game Over! Your Score: ${currentScore}`);
-
-            // Отправка данных на сервер
-            sendScoreToServer(currentScore);
-
-            document.getElementById('gameArea').style.display = 'none';
-            document.querySelector('.controls').style.display = 'none'; // Скрыть кнопки управления
-            document.getElementById('mainMenu').style.display = 'block';
-            document.getElementById('totalScore').textContent = totalScore;
-        }
-
-        // Функция для изменения направления с кнопок
-        function changeDirection(direction) {
-            if (direction === 'UP' && snakeDirection !== 'DOWN') snakeDirection = 'UP';
-            if (direction === 'DOWN' && snakeDirection !== 'UP') snakeDirection = 'DOWN';
-            if (direction === 'LEFT' && snakeDirection !== 'RIGHT') snakeDirection = 'LEFT';
-            if (direction === 'RIGHT' && snakeDirection !== 'LEFT') snakeDirection = 'RIGHT';
-        }
-
-        // Функция для отправки данных на сервер
-        function sendScoreToServer(score) {
-            const playerName = prompt("Enter your name:"); // Запрашиваем имя игрока
-
-            if (playerName) {
-                fetch('http://localhost:5000/submit_score', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Категория A', 'Категория B', 'Категория C', 'Категория D'],
+                datasets: [{
+                    data: [40, 30, 20, 10],
+                    backgroundColor: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
                     },
-                    body: JSON.stringify({
-                        name: playerName,
-                        score: score
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Score submitted successfully:', data);
-                })
-                .catch(error => {
-                    console.error('Error submitting score:', error);
-                });
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.label || '';
+                                const value = tooltipItem.raw || 0;
+                                return `${label}: ${value}%`;
+                            }
+                        }
+                    }
+                }
             }
-        }
-
-        // Управление с клавиатуры для десктопа
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp' && snakeDirection !== 'DOWN') snakeDirection = 'UP';
-            if (e.key === 'ArrowDown' && snakeDirection !== 'UP') snakeDirection = 'DOWN';
-            if (e.key === 'ArrowLeft' && snakeDirection !== 'RIGHT') snakeDirection = 'LEFT';
-            if (e.key === 'ArrowRight' && snakeDirection !== 'LEFT') snakeDirection = 'RIGHT';
         });
     </script>
-
 </body>
 </html>
